@@ -40,10 +40,10 @@
         {% editable page.genericresource.discoverable %}
         <li class='list-group-item'><b>Discoverable:</b> {{ page.genericresource.discoverable|yesno }}</li>
         {% endeditable %}
-    </ul> 
+    </ul>
     <h5>Owners</h5>
     <div class='list-group'>
-        {% editable page.genericresource.owners %} 
+        {% editable page.genericresource.owners %}
         {% for owner in page.genericresource.owners.all %}
         <a class='list-group-item' href='mailto:{{ page.genericresource.owner.email }}'>
              {% if owner.first_name %}
@@ -60,7 +60,7 @@
 <h4>Dublin Core Metadata</h4>
 <table class="table table-striped">
 {% for m in page.genericresource.dublin_metadata.all %}
-<tr> 
+<tr>
 <td>{{m.term_name}}</td>
 <td>{{m.qualifier}}</td>
 <td>{{m.content}}</td>
@@ -71,13 +71,13 @@
 <h4>Keywords</h4>
 
 <ul class='list-group'>
-    {% editable page.keywords %} 
+    {% editable page.keywords %}
     {% for keyword in page.keywords.all %}
     <li class='list-group-item'>{{ keyword }}</li>
     {% endfor %}
     {% endeditable %}
 </ul>
-    
+
     {% include 'pages/includes/page_permissions_editor.html' %}
 
 {% endblock %}
