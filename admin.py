@@ -2,4 +2,4 @@ from mezzanine.pages.admin import PageAdmin
 from django.contrib.gis import admin
 from .models import *
 
-admin.site.register(HydromodelResource, PageAdmin)
+admin.site.register(HydroProgramResource, PageAdmin)

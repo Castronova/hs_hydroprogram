@@ -1,7 +1,10 @@
 from django.conf.urls import patterns, url
-from hs.hydromodel import views
+from hs_hydroprogram import views
+
 
 
 urlpatterns = patterns('',
-                       url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
+           url(r'^_internal/create-hydro-program/$', views.create_hydro_program),
+           url(r'^_internal/parse-metadata/$', views.parse_metadata),
+           url(r'^(?P<pk>\d+)/$', views.DetailView.as_view(), name='detail'),
 )
