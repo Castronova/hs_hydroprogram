@@ -9,6 +9,9 @@ from django import forms
 from .models import HydroProgramResource
 from django.utils.timezone import now
 from ga_resources.utils import json_or_jsonp
+import json
+import os
+from django.conf import settings
 
 
 class DetailView(generic.DetailView):
@@ -32,8 +35,17 @@ class CreateHydroProgramForm(forms.Form):
     site = forms.CharField(required=False, min_length=0)
     variable = forms.CharField(required=False, min_length=0)
 
+
 @login_required
 def create_hydro_program(request, *args, **kwargs):
+
+
+    eula = json.loads('../static/resources/eula.json')
+    print eula
+
+#    return render(request, 'template.html', {"mydata": mydata},
+#        content_type="application/xhtml+xml")
+
     frm = CreateHydroProgramForm(request.POST)
     if frm.is_valid():
         dcterms = [
@@ -65,7 +77,8 @@ def create_hydro_program(request, *args, **kwargs):
             reference_type=frm.cleaned_data['reference_type'],
             url=url,
             data_site=frm.cleaned_data.get('site', ''),
-            variable=frm.cleaned_data.get('variable', '')
+            variable=frm.cleaned_data.get('variable', ''),
+            eula = eula
         )
         return HttpResponseRedirect(res.get_absolute_url())
 
@@ -90,21 +103,52 @@ def parse_metadata(request):
 
     return json_response(True,data)
 
-    #return json_or_jsonp(request, ts)
-
-        # params = f.cleaned_data
-        # ref_type = params['ref_type']
-        # url = params['service_url']
-        # site = params.get('site')
-        # variable = params.get('variable')
-        # if ref_type == 'rest':
-        #     ts = ts_utils.time_series_from_service(url, ref_type)
-        # else:
-        #     ts = ts_utils.time_series_from_service(url, ref_type, site_name_or_code=site, variable_code=variable)
-        # return json_or_jsonp(request, ts)
 
 
-import json
+
+def get_eula(request):
+
+    print 'IN: get_eula(request)'
+
+    name = request.GET.get('name','NONE')
+    print name
+    response = {'eula':'Could not find a EULA for: '+name}
+
+    formatted_name = name.lower().replace(' ','')
+
+    try:
+        path = os.path.join(settings.STATIC_ROOT, 'resources/eulas.json')
+        txt = open(path,'r').readlines()[0]
+        #print txt
+
+        # todo: move th is to view load, so that it isn't constantly repeated
+        # load the eula dictionary
+        print 'parsing json'
+        #print json.loads('[{"noun": "hello", "Hola": "Hello", "Hoi": "Hello"}]')
+        #print json.loads(txt)
+
+        eula_dict = json.loads(txt)
+        print 'done'
+        print eula_dict.keys()
+
+        print formatted_name in eula_dict
+        print formatted_name in eula_dict.keys()
+
+        #print eula_dict.values()
+
+
+        # set the response
+        if formatted_name in eula_dict:
+            response['eula'] = eula_dict[formatted_name]
+        else:
+            print formatted_name, 'not in dictionary!'
+
+    except Exception, e:
+        print e
+
+    return json_response(True,response)
+
+
 
 def json_response(result, data):
     response = json.dumps({"result" : result, "data" : data })
