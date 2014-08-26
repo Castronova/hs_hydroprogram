@@ -17,6 +17,7 @@ from django.conf import settings
 from .metadata import parser
 import mmap
 
+
 class DetailView(generic.DetailView):
     model = HydroProgramResource
     #template_name = 'hydromodel/detail.html'
@@ -42,9 +43,10 @@ class CreateHydroProgramForm(forms.Form):
 @login_required
 def create_hydro_program(request, *args, **kwargs):
 
+    print 'CREATE RESOURCE'
 
-    eula = json.loads('../static/resources/eula.json')
-    print eula
+    #eula = json.loads('../static/resources/eula.json')
+    #print eula
 
 #    return render(request, 'template.html', {"mydata": mydata},
 #        content_type="application/xhtml+xml")
@@ -70,6 +72,8 @@ def create_hydro_program(request, *args, **kwargs):
         else:
             url = ''
 
+
+
         res = hydroshare.create_resource(
             resource_type='HydroProgramResource',
             owner=request.user,
@@ -81,10 +85,9 @@ def create_hydro_program(request, *args, **kwargs):
             url=url,
             data_site=frm.cleaned_data.get('site', ''),
             variable=frm.cleaned_data.get('variable', ''),
-            eula = eula
+            #eula = eula
         )
         return HttpResponseRedirect(res.get_absolute_url())
-
 
 
 def parse_metadata(request):
@@ -128,7 +131,6 @@ def get_eula(request):
     print 'IN: get_eula(request)'
 
     name = request.GET.get('name','NONE')
-    print name
     response = {'eula':'Could not find a EULA for: '+name}
 
     formatted_name = name.lower().replace(' ','')
@@ -136,22 +138,10 @@ def get_eula(request):
     try:
         path = os.path.join(settings.STATIC_ROOT, 'resources/eulas.json')
         txt = open(path,'r').readlines()[0]
-        #print txt
 
         # todo: move th is to view load, so that it isn't constantly repeated
         # load the eula dictionary
-        print 'parsing json'
-        #print json.loads('[{"noun": "hello", "Hola": "Hello", "Hoi": "Hello"}]')
-        #print json.loads(txt)
-
         eula_dict = json.loads(txt)
-        print 'done'
-        print eula_dict.keys()
-
-        print formatted_name in eula_dict
-        print formatted_name in eula_dict.keys()
-
-        #print eula_dict.values()
 
 
         # set the response
