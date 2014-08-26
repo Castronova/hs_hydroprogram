@@ -46,19 +46,19 @@ class multidict(dict):
 
 
 
-def validate(ini_path):
+def validate(ini_content):
 
     cparser = ConfigParser.ConfigParser(None, multidict)
 
-     # parse the ini
-    cparser.read(ini_path)
+    print '1'
+
+    # parse the ini
+    cparser.read(ini_content)
+
+    print '2'
 
     # get the ini sections from the parser
     parsed_sections = cparser.sections()
-
-    # load lookup tables
-    var = pickle.load(open('../data/var_cv.dat','rb'))
-    unit = pickle.load(open('../data/units_cv.dat','rb'))
 
     # todo: validate phone numbers using regex
     # todo: validate emails using regex
@@ -66,16 +66,11 @@ def validate(ini_path):
     # todo: validate that format is of a recognized type (application/zip, application/octet-stream)
     # todo: make sure subject is delimited by a semicolon
 
+
     # validate
     for section in parsed_sections:
         # get ini options
         options = cparser.options(section)
-
-        # validate units and variables parameters
-        if section.split('_')[0] == 'output' or section.split('_')[0] == 'input':
-            # check that variable and unit exist
-            if 'variable_name_cv' not in options or 'unit_type_cv' not in options:
-                raise Exception ('Inputs and Outputs must contain "variable_name_cv" and "unit_type_cv" parameters ')
 
         # check each option individually
         for option in options:
@@ -92,14 +87,35 @@ def validate(ini_path):
                 if not isinstance(val,type(getattr(metadata_type_struct, option))):
                     raise Exception(option+' is not of type '+getattr(metadata_type_struct, option))
 
-                # check variable cv (i.e. lookup table)
-                if option == 'variable_name_cv':
-                    if val not in var:
-                        raise Exception (val+' is not a valid controlled vocabulary term')
-
-                # check unit type cv (i.e. lookup table)
-                if option == 'unit_type_cv':
-                    if val not in unit:
-                        raise Exception (val+' is not a valid controlled vocabulary term')
 
     return 1
+
+def get_metadata_dictionary(ini_content):
+
+    cparser = ConfigParser.ConfigParser(None, multidict)
+
+    # parse the ini
+    cparser.readfp(ini_content)
+
+    # get the ini sections from the parser
+    parsed_sections = cparser.sections()
+
+    meta_dict = {}
+    for section in parsed_sections:
+        section_name = section.split('^')[0]
+
+        options = cparser.options(section)
+
+        # save ini options as dictionary
+        d = {}
+        for option in options:
+            d[option] = cparser.get(section,option)
+        d['type'] = section
+
+        if section_name not in meta_dict:
+            meta_dict[section_name] = [d]
+        else:
+            meta_dict[section_name].append(d)
+
+
+    return meta_dict

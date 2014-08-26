@@ -4,6 +4,8 @@ from django.views import generic
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render_to_response
+#from django.common.decorators import render_to
 from hs_core import hydroshare
 from django import forms
 from .models import HydroProgramResource
@@ -12,7 +14,8 @@ from ga_resources.utils import json_or_jsonp
 import json
 import os
 from django.conf import settings
-
+from .metadata import parser
+import mmap
 
 class DetailView(generic.DetailView):
     model = HydroProgramResource
@@ -83,23 +86,37 @@ def create_hydro_program(request, *args, **kwargs):
         return HttpResponseRedirect(res.get_absolute_url())
 
 
-class GetTSValuesForm(forms.Form):
-    # name = forms.CharField(min_length=0, required=True)
-    # type = forms.CharField(min_length=0, required=True)
-    size = forms.CharField(min_length=0, required=True)
-    # content = forms.CharField(min_length=0, required=False)
 
 def parse_metadata(request):
 
     name = request.POST.get('name','NONE')
     type = request.POST.get('type','NONE')
     size = request.POST.get('size','NONE')
-    #if f.is_valid():
+    content = request.POST.get('content', 'NONE')
+    parsed_metadata = {}
+
+    print content
+    if content != 'NONE':
+        # todo: validate the metadata file
+        #if parser.validate(content):
+
+        # create a file object in memory
+        fileObj = mmap.mmap(-1,len(content))
+        fileObj.write(content)
+        fileObj.seek(0)
+
+        # parse the file object
+        parsed_metadata = parser.get_metadata_dictionary(fileObj)
+
+
 
 
     data = {'name':name,
             'type':type,
-            'size':size}
+            'size':size,
+            'content':parsed_metadata}
+
+    render_to_response('create_hydro_program.html', {'h': 'test'})
 
     return json_response(True,data)
 

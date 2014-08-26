@@ -1,0 +1,326 @@
+{% extends "pages/create-resource.html" %}
+
+{% load geoanalytics_tags mezzanine_tags pages_tags hydroshare_tags staticfiles%}
+
+{% block title %}
+
+    Create a HydroProgram Resource
+
+{% endblock %}
+
+{% block main %}
+
+    <h2>Upload files to create a new Resource:</h2>
+
+    <ul>
+      <li>All of the files you upload here will be grouped together into a "Resource"</li>
+      <li>File size is limited to 4 GB per file</li>
+      <li>Once you've added all of your files, you can describe your Resource using the form below</li>
+      <li>Files are private, until you choose to share them</li>
+    </ul>
+
+
+
+    <form class="form-horizontal" role="form" method="POST" enctype="multipart/form-data" action="/hsapi/_internal/create-resource/">
+    {% csrf_token %}
+
+    <table class="table" id="file-list">
+      <tbody id="files">
+        <tr>
+            <td><input class="form-control" type="file" name="files" id='my-files' multiple="multiple" id=""/></td>
+        </tr>
+      </tbody>
+    </table>
+
+
+
+
+<h2>Describe your Resource with metadata:</h2>
+
+    <p>Use this form to create metadata for your Resource. Be as descriptive as you can since all of this information
+        will show up when your Resource is displayed. You can edit this information later.
+    </p>
+
+  <h3> General Metadata: </h3>
+  <div class="form-group">
+    <label for="" class="col-sm-2 control-label">Description</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="hm_description" id="hm_description" placeholder="Description">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="" class="col-sm-2 control-label">Version</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="hm_version" id="hm_version" placeholder="Version">
+    </div>
+  </div>
+
+   <div class="form-group">
+    <label for="" class="col-sm-2 control-label">Type</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" name="hm_type" id="hm_type" placeholder="Instance">
+    </div>
+   </div>
+
+  <h3> Software Metadata: </h3>
+  <div class="form-group">
+    <label for="" class="col-sm-2 control-label">Software Url</label>
+    <div class="col-sm-10">
+        <input type="text" class="form-control" name="software_url" id="software_url"placeholder="software url">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="" class="col-sm-2 control-label">Date Released</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="date_released" name='date_released' placeholder="Date Released">
+    </div>
+  </div>
+
+
+  <div class="form-group">
+    <label for="" class="col-sm-2 control-label">Version</label>
+    <div class="col-sm-10">
+      <input type="text" class="form-control" id="software_version" name='software_version' placeholder="1.1.12">
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="" class="col-sm-2 control-label">rights</label>
+    <div class="col-sm-10">
+{#      <input type="text" class="form-control" id="" name='software_rights' placeholder="Software Rights">#}
+      <select class="form-control" id="eula_selector" name='eula_selector'>
+          <option value="None">Please choose...</option>
+          <option value="gnugeneralpubliclicense,version3">GNU GENERAL PUBLIC LICENSE, Version 3</option>
+          <option value="gnugeneralpubliclicense,version2">GNU General Public License, Version 2</option>
+          <option value="mitlicense">MIT License (MIT)</option>
+          <option value="mozillapubliclicense2.0">Mozilla Public License 2.0</option>
+      </select>
+       <br>
+      <textarea class="form-control" name="eula" id="eula" cols="30" rows="10" placeholder="Select or create a software license agreement" readonly></textarea>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-primary btn-lg btn-block">Create Resource</button>
+    </div>
+  </div>
+
+</form>
+
+{% endblock %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+
+
+    function deleteRow(r) {
+            $(r).remove();
+    }
+
+    var f = null;
+
+
+
+
+    $(function() {
+        var fileCount = 1;
+
+
+
+
+        $("#add-row").click(function() {
+            fileCount++;
+
+            $("#files").append(
+                '<tr id="file' + fileCount + '">' +
+                    '<td><input class="form-control" type="file" name="file' + fileCount + '"/></td>' +
+                    '<td><button class="btn btn-danger btn-block deleter" onClick=\'deleteRow("#file' + fileCount + '")\'>Delete</button></td>' +
+                '</tr>'
+            );
+            return false;
+        });
+
+        // ----------------------
+        // EULA Selector Function
+        // ----------------------
+        $('#eula_selector').change(function() {
+
+            // get selected value
+            var selected_name = this.options[this.selectedIndex].value;
+
+            if (selected_name == 'None'){
+                document.getElementById('eula').textContent = 'Select or create a software license agreement';
+            }
+            else {
+                // look up the eula agreement
+                // call view to get data
+                $.ajax({
+
+                        type:"GET",
+                        url:'/hsapi/_internal/get-eula/',
+                        data: { name: selected_name},
+                        success: function(response){
+                            console.log('Success');
+                            console.log(response)
+                            // set the response data in the eula textbox
+                            var data = response['eula'];
+                            var eula = response['data']['eula'];
+                            console.log(data);
+                            document.getElementById('eula').textContent = eula;
+
+                        },
+                        error: function(response){
+                            console.log('POST Error');
+                            //console.log(response);
+                        }
+                });
+            }
+
+        });
+
+
+        // ---------------------
+        // Select Files Function
+        //----------------------
+        var control = document.getElementById('my-files');
+        control.addEventListener("change", function(evt) {
+
+
+        // When the control has changed, there are new files
+        var i = 0,
+            files = control.files,
+            len = files.length;
+
+
+        for (; i < len; i++) {
+
+            ext =  files[i].name.split('.').pop();
+            console.log("Filename: " + files[i].name);
+            console.log("Type: " + files[i].type);
+            console.log("Size: " + files[i].size + " bytes");
+            console.log("Extension: " + ext);
+
+            if (ext == 'meta'){
+                console.log('I can parse this file!');
+
+                var f = evt.target.files[i];
+                if (f) {
+                    var r = new FileReader();
+                    r.onload = function(e) {
+	                    var contents = e.target.result;
+                        alert( "Got the file.n"
+                              +"name: " + f.name + "\n"
+                              +"type: " + f.type + "\n"
+                              +"size: " + f.size + " bytes \n"
+                              + contents.substr(1, contents.indexOf("n")));
+
+                        // call view to get data
+                        $.ajax({
+                                type:"POST",
+                                url:'/hsapi/_internal/parse-metadata/',
+                                data: { name: f.name,
+                                        size: f.size,
+                                        type: f.type,
+                                        content: contents},
+
+                                success: function(response){
+                                    console.log('POST Success');
+                                    console.log(response);
+
+                                    var data = response['data'];
+
+                                    console.log(data['name']);
+
+                                    console.log(data['content']['software'][0]['date_released']);
+                                    console.log(data['content']['software'][0]['url']);
+                                    console.log(data['content']['software'][0]['version']);
+
+                                    // set field data
+                                    document.getElementById('hm_description').value = data['content']['resource'][0]['abstract'];
+                                    document.getElementById('software_version').value = data['content']['software'][0]['version'];
+                                    document.getElementById('software_url').value = data['content']['software'][0]['url'];
+                                    document.getElementById('date_released').value = data['content']['software'][0]['date_released'];
+                                    document.getElementById('software_version').value = data['content']['software'][0]['version'];
+
+                                },
+                                error: function(response){
+                                    console.log('POST Error');
+                                    console.log(response);
+                                }
+                        });
+                    }
+                    r.readAsText(f);
+
+                } else {
+                    alert("Failed to load file");
+                }
+
+
+            }
+        }
+    }, false);
+
+
+
+
+        $("eula_selector").change(function(){
+{#        eula_selector.addEventListener("change", function(evt) {#}
+
+
+            // get selected value
+            var selected_name = this.options[this.selectedIndex].value;
+            console.log(selected_name);
+
+
+            eula.value = selected_name;
+
+
+
+
+{#                // call view to get data#}
+{#                $.ajax({#}
+{#                        type:"POST",#}
+{#                        url:'/hsapi/_internal/parse-metadata/',#}
+{#                        data: { name: f.name,#}
+{#                                size: f.size,#}
+{#                                type: f.type,#}
+{#                                content: contents},#}
+{##}
+{#                        success: function(response){#}
+{#                            console.log('POST Success');#}
+{#                            console.log(response);#}
+{##}
+{#                            var data = response['data'];#}
+{##}
+{#                            console.log(data['name']);#}
+{##}
+{##}
+{#                            // get the parsed metadata#}
+{#                            // todo#}
+{##}
+{#                            //var units = data['units'],#}
+{#                            //        d = data['for_graph'];#}
+{#                            //if (units==undefined){units='Data'}#}
+{#                            //d.sort(compare);#}
+{#                            //dat = d;#}
+{#                            //u = units;#}
+{#                        },#}
+{#                        error: function(response){#}
+{#                            console.log('POST Error');#}
+{#                            console.log(response);#}
+{#                        }#}
+{#                });#}
+}, false);
+    });
+
+
+
+
+
+
+
+    </script>
+{% endblock %}

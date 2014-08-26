@@ -2,9 +2,10 @@ __author__ = 'tonycastronova'
 
 import ConfigParser
 import os, sys
+from os.path import *
 import unittest
-from metadata.parser import *
-
+from hs_hydroprogram.metadata.parser import *
+import mmap
 
 class test_ini_parse(unittest.TestCase):
 
@@ -12,6 +13,23 @@ class test_ini_parse(unittest.TestCase):
         self.cparser = ConfigParser.ConfigParser(None, multidict)
         self.config = os.path.realpath('../mytest.meta')
 
+
+    def test_get_metadata_dict(self):
+
+        path = abspath(join(dirname(__file__),'../mytest.meta'))
+        #path = os.path.join(os.path.abspath(__file__),'mytest.meta')
+
+        # this is what will be passed via POST
+        ini_file = open(path, 'r')
+        content = ini_file.read()
+
+        fileObj = mmap.mmap(-1,len(content))
+        fileObj.write(content)
+        fileObj.seek(0)
+
+        dict = get_metadata_dictionary(fileObj)
+
+        print 'done'
 
     def test_sections(self):
 

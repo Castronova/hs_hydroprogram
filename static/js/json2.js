@@ -164,7 +164,8 @@ if (!JSON) {
     JSON = {};
 }
 
-(function () {
+(
+    function () {
     'use strict';
 
     function f(n) {
