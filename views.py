@@ -33,11 +33,12 @@ class CreateHydroProgramForm(forms.Form):
     contributors = forms.CharField(required=False, min_length=0)
     abstract = forms.CharField(required=False, min_length=0)
     keywords = forms.CharField(required=False, min_length=0)
-    rest_url = forms.URLField(required=False)
-    wsdl_url = forms.URLField(required=False)
+    # rest_url = forms.URLField(required=False)
+    # wsdl_url = forms.URLField(required=False)
     reference_type = forms.CharField(required=False, min_length=0)
-    site = forms.CharField(required=False, min_length=0)
-    variable = forms.CharField(required=False, min_length=0)
+    # site = forms.CharField(required=False, min_length=0)
+    # variable = forms.CharField(required=False, min_length=0)
+    software_url = forms.CharField(required=False, min_length=0)
 
 
 @login_required
@@ -52,26 +53,30 @@ def create_hydro_program(request, *args, **kwargs):
 #        content_type="application/xhtml+xml")
 
     frm = CreateHydroProgramForm(request.POST)
+
     if frm.is_valid():
         dcterms = [
             { 'term': 'T', 'content': frm.cleaned_data['title']},
             { 'term': 'AB', 'content': frm.cleaned_data['abstract'] or frm.cleaned_data['title']},
             { 'term': 'DTS', 'content': now().isoformat()}
         ]
-        for cn in frm.cleaned_data['contributors'].split(','):
-            cn = cn.strip()
-            dcterms.append({'term' : 'CN', 'content' : cn})
-        for cr in frm.cleaned_data['creators'].split(','):
-            cr = cr.strip()
-            dcterms.append({'term' : 'CR', 'content' : cr})
 
-        if frm.cleaned_data['wsdl_url']:
-            url = frm.cleaned_data['wsdl_url']
-        elif frm.cleaned_data['rest_url']:
-            url = frm.cleaned_data['rest_url']
-        else:
-            url = ''
+        # for cn in frm.cleaned_data['contributors'].split(','):
+        #     cn = cn.strip()
+        #     dcterms.append({'term' : 'CN', 'content' : cn})
+        # for cr in frm.cleaned_data['creators'].split(','):
+        #     cr = cr.strip()
+        #     dcterms.append({'term' : 'CR', 'content' : cr})
 
+        # if frm.cleaned_data['wsdl_url']:
+        #     url = frm.cleaned_data['wsdl_url']
+        # elif frm.cleaned_data['rest_url']:
+        #     url = frm.cleaned_data['rest_url']
+        # else:
+        #     url = ''
+
+
+        print 'HERE'
 
 
         res = hydroshare.create_resource(
@@ -81,11 +86,11 @@ def create_hydro_program(request, *args, **kwargs):
             keywords=[k.strip() for k in frm.cleaned_data['keywords'].split(',')] if frm.cleaned_data['keywords'] else None,
             dublin_metadata=dcterms,
             content=frm.cleaned_data['abstract'] or frm.cleaned_data['title'],
-            reference_type=frm.cleaned_data['reference_type'],
-            url=url,
-            data_site=frm.cleaned_data.get('site', ''),
-            variable=frm.cleaned_data.get('variable', ''),
-            #eula = eula
+            # reference_type=frm.cleaned_data['reference_type'],
+            software_url=frm.cleaned_data['software_url'],
+            # data_site=frm.cleaned_data.get('site', ''),
+            # variable=frm.cleaned_data.get('variable', ''),
+            #software_rights = frm.cleaned_data['eula'],
         )
         return HttpResponseRedirect(res.get_absolute_url())
 
