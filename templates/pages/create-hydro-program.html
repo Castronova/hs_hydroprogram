@@ -80,14 +80,14 @@
 
   <div class="form-group">
     <label for="" class="col-sm-2 control-label">Creators*</label>
-    <div class="col-sm-10">
+    <div class="col-sm-10" id="creators_group">
       <input type="text" class="form-control" name="creators" id="creators" placeholder="Creators" >
     </div>
   </div>
 
    <div class="form-group">
     <label for="" class="col-sm-2 control-label">Contributors*</label>
-    <div class="col-sm-10">
+    <div class="col-sm-10" id="contributors_group">
       <input type="text" class="form-control" name="contributors" id="contributors" placeholder="Contributors" >
     </div>
    </div>
@@ -281,49 +281,53 @@
                                     document.getElementById('abstract').value = data['content']['resource'][0]['abstract'];
                                     document.getElementById('keywords').value = data['content']['resource'][0]['subject'];
 
+                                    // create breakline object
+                                    var break_line = document.createElement("br");
+
+                                    // add creator fields
                                     var creators = data['content']['creator'];
-                                    var creator_txt = "";
-                                    for (var i = 0; i < creators.length; i++) {
-                                        creator_txt += creators[i]["name"] + ";";
+                                    var l = creators.length;
+
+                                    if (l > 0){
+                                        var creator_txt = creators[0]["name"];
+                                        document.getElementById('creators').value = creator_txt;
+                                    }
+                                    for (var i = 1; i < l; i++) {
+{#                                        var creator_txt = creators[i]["name"];#}
 
                                         {#  Create creator new field         #}
-{#                                        var f = document.createElement("input");#}
-{#                                        f.setAttribute('type',"text");#}
-{#                                        f.setAttribute('class',"form-control");#}
-{#                                        f.setAttribute('name',"creators");#}
-{#                                        f.setAttribute('value',creators[i]["name"]);#}
+                                        var f = document.createElement("input");
+                                        f.setAttribute('type',"text");
+                                        f.setAttribute('class',"form-control");
+                                        f.setAttribute('name',"creators");
+                                        f.setAttribute('value',creators[i]["name"]);
+
+
+                                        document.getElementById("creators_group").appendChild(break_line);
+                                        document.getElementById("creators_group").appendChild(f);
                                         {#  Should this also contain other creator metadata? #}
-
-
-
-{#                                        <input type="text" class="form-control" name="creators" id="creators" placeholder="Creators" value="{{ user|best_name }}">#}
                                     }
-                                    document.getElementById('creators').value = creator_txt;
 
+                                    // add contributor fields
                                     var contrib = data['content']['contributor'];
-                                    var contrib_txt = "";
-                                    for (var i = 0; i < contrib.length; i++) {
-                                        contrib_txt += contrib[i]["name"] + "; ";
+                                    console.log(contrib);
+                                    l = contrib.length;
+                                    console.log(l);
+                                    if (l > 0){
+                                        var contrib_txt = contrib[0]["name"];
+                                        document.getElementById('contributors').value = contrib_txt;
                                     }
-                                    document.getElementById('contributors').value = contrib_txt;
+                                    for (var i = 1; i < l; i++){
+                                        f = document.createElement("input");
+                                        f.setAttribute('type',"text");
+                                        f.setAttribute('class',"form-control");
+                                        f.setAttribute('name',"contributors");
+                                        f.setAttribute('value',contrib[i]["name"]);
+                                        document.getElementById("contributors_group").appendChild(break_line);
+                                        document.getElementById("contributors_group").appendChild(f);
+                                        {#  Should this also contain other creator metadata? #}
+                                    }
 
-{#                                    #}
-{#                                    f.setAttribute('method',"post");#}
-{#                                    f.setAttribute('action',"submit.php");#}
-{#                                    #}
-{#                                    var i = document.createElement("input"); //input element, text#}
-{#                                    i.setAttribute('type',"text");#}
-{#                                    i.setAttribute('name',"username");#}
-{#                                    #}
-{#                                    var s = document.createElement("input"); //input element, Submit button#}
-{#                                    s.setAttribute('type',"submit");#}
-{#                                    s.setAttribute('value',"Submit");#}
-{#                                    #}
-{#                                    f.appendChild(i);#}
-{#                                    f.appendChild(s);#}
-{#                                    #}
-{#                                    document.getElementById('creators').value =#}
-{#                                    document.getElementById('contributors').value = data['content']['resource'][0]['contributors'];#}
 
 
                                     document.getElementById('software_version').value = data['content']['software'][0]['version'];

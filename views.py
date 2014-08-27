@@ -98,7 +98,7 @@ def parse_metadata(request):
     content = request.POST.get('content', 'NONE')
     parsed_metadata = {}
 
-    print content
+
     if content != 'NONE':
         # todo: validate the metadata file
         #if parser.validate(content):
@@ -108,10 +108,9 @@ def parse_metadata(request):
         fileObj.write(content)
         fileObj.seek(0)
 
+
         # parse the file object
         parsed_metadata = parser.get_metadata_dictionary(fileObj)
-
-
 
 
     data = {'name':name,
@@ -119,7 +118,8 @@ def parse_metadata(request):
             'size':size,
             'content':parsed_metadata}
 
-    render_to_response('create_hydro_program.html', {'h': 'test'})
+
+    #render_to_response('create_hydro_program.html', {'h': 'test'})
 
     return json_response(True,data)
 
