@@ -61,11 +61,19 @@
         <br>
         <br>
 
-    <output id="list">
-        <ul id="filelist">
+    <!--<output id="list">-->
+        <!--<ul id="filelist">-->
 
-        </ul>
-    </output>
+        <!--</ul>-->
+    <!--</output>-->
+
+        <div id="uploaded_files">
+
+            <table id="uploaded_files_table">
+
+            </table>
+
+        </div>
 
         <br>
         <br>
@@ -439,17 +447,71 @@
             // save this file
             myfiles[f.name] = f;
 
+            // create a select list
+            var selections = ['source code','executable','user manual','theoretical manual','other'];
+            var select_list = document.createElement('select');
+            select_list.id = 'mySelect';
+            for (var i =0; i < selections.length; i++){
+                var option = document.createElement('option');
+                option.value = selections[i];
+                option.text = selections[i];
+                select_list.appendChild(option);
+            }
+
             // add new fields for each file
-            var filelist = document.getElementById('filelist');
+//            var filelist = document.getElementById('filelist');
+//
+//            var li = document.createElement("li");
+//            var value = [];
+//            value.push('<strong>', f.name, '</strong> (', f.type || 'n/a', ') - ',
+//                            f.size, ' bytes, last modified: ',
+//                          f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+//                          '</li>');
+//            li.innerHTML = value.join('');
 
-            var li = document.createElement("li");
-            var value = [];
-            value.push('<strong>', f.name, '</strong> (', f.type || 'n/a', ') - ',
-                            f.size, ' bytes, last modified: ',
-                          f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                          '</li>');
 
-            li.innerHTML = value.join('');
+            var table = document.getElementById('uploaded_files_table');
+//            table.cellPadding = 10;
+
+            //table.paddingLeft = '10';
+            //table.style.paddingRight = '10';
+
+            var row = table.insertRow(table.rows.length);
+
+
+            var text = document.createTextNode(f.name);
+            //var element.appendChild(select_list);
+
+            var cell_filename = row.insertCell(0);
+            cell_filename.style.paddingLeft = '10px';
+            cell_filename.style.paddingRight = '10px';
+            cell_filename.style.fontWeight = 'bold';
+            cell_filename.appendChild(text);
+
+            var cell_type = row.insertCell(1);
+            cell_type.style.paddingLeft = '10px';
+            cell_type.style.paddingRight = '10px';
+            var type = f.type || 'n/a';
+            cell_type.appendChild(document.createTextNode( 'type: ' + type));
+
+            var cell_size = row.insertCell(2);
+            cell_size.style.paddingLeft = '10px';
+            cell_size.style.paddingRight = '10px';
+            cell_size.appendChild(document.createTextNode( 'size: ' + f.size + ' bytes'));
+
+            var cell_date = row.insertCell(3);
+            cell_date.style.paddingLeft = '10px';
+            cell_date.style.paddingRight = '10px';
+            var date = f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a';
+            cell_date.appendChild(document.createTextNode( 'last modified: ' +date));
+
+            var cell_list = row.insertCell(4);
+            cell_list.appendChild(select_list);
+
+
+
+            //document.getElementById('uploaded_files').appendChild(element);
+
 
             console.log(li);
 
