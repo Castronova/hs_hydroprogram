@@ -27,10 +27,10 @@ class HydroProgramResource(Page, RichText, AbstractResource):
     ############################
 
     # version
-    hm_version = models.CharField(verbose_name='Software Version ',null=False,blank=True,default='1.0',max_length=255,
+    software_version = models.CharField(verbose_name='Software Version ',null=False,blank=True,default='1.0',max_length=255,
                                           help_text='The software version of the model program')
     # program language
-    software_version = models.CharField(verbose_name="Software Language", null=False,default='',max_length=100,
+    software_language = models.CharField(verbose_name="Software Language", null=False,default='',max_length=100,
                                         help_text="The programming language that the model program was written in")
     # operating system
     operating_sys = models.CharField(verbose_name='Operating System',null=False,blank=True,default='unknown',max_length=255,
