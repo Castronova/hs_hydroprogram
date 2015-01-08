@@ -1,83 +1,185 @@
 {% extends "pages/create-resource.html" %}
 
-{#{% load geoanalytics_tags mezzanine_tags pages_tags hydroshare_tags staticfiles%}#}
+{% load geoanalytics_tags mezzanine_tags pages_tags hydroshare_tags staticfiles crispy_forms_tags%}
 
 {% load static %}
 
 {% block extra_head %}
-<link rel="stylesheet" type="text/css" href="{% static 'css/upload.css' %}" />
+<!--<link rel="stylesheet" type="text/css" href="{% static 'css/upload.css' %}" />-->
+<!--<link href="{% static 'main/css/dropzone.css' %}" type="text/css" rel="stylesheet"/>-->
+<!--<script src="{% static 'main/js/dropzone.js' %}"></script>-->
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+
+    <!-- Custom CSS -->
+    <link href="../static/css/style.css" rel="stylesheet">
+
+
 {% endblock %}
 
 {% block title %}
 
-    Create a HydroProgram Resource
+    Create a Model Program Resource
 
 {% endblock %}
 
 {% block main %}
 
+
+     <!--<div class="alert alert-error">-->
+                <!--<strong>{{ form.title }}</strong>-->
+                <!--<strong>{{ page.get_content_model.form.title }}</strong>-->
+     <!--</div>-->
+
+
+     <!--<h2>{{ page.get_content_model.form.title }}</h2>-->
+
+     <!--{% if form.errors %}-->
+        <!--{% for field in form %}-->
+            <!--{% for error in field.errors %}-->
+                <!--<div class="alert alert-error">-->
+                    <!--<strong>{{ error|escape }}</strong>-->
+                <!--</div>-->
+            <!--{% endfor %}-->
+        <!--{% endfor %}-->
+        <!--{% for error in form.non_field_errors %}-->
+            <!--<div class="alert alert-error">-->
+                <!--<strong>{{ error|escape }}</strong>-->
+            <!--</div>-->
+        <!--{% endfor %}-->
+    <!--{% endif %}-->
+
     <h2>Upload files to create a new Resource:</h2>
+    <h2> {{ test }}</h2>
 
-{#    <ul>#}
-{#      <li>All of the files you upload here will be grouped together into a "Resource"</li>#}
-{#      <li>File size is limited to 4 GB per file</li>#}
-{#      <li>Once you've added all of your files, you can describe your Resource using the form below</li>#}
-{#      <li>Files are private, until you choose to share them</li>#}
-{#    </ul>#}
+<!--    <h2> Hardcoded Text </h2> -->
 
 
-    <form class="form-horizontal" role="form" method="POST" enctype="multipart/form-data" action="/hsapi/_internal/create-hydro-program/">
-    {% csrf_token %}
+    <!---->
+    <form class="form-horizontal">
 
-{#    <table class="table" id="file-list">#}
-{#      <tbody id="files">#}
-{#        <tr>#}
-{#            <td><input class="form-control" type="file" name="files" id='my-files' multiple="multiple" id=""/></td>#}
-{#        </tr>#}
-{#      </tbody>#}
-{#    </table>#}
+    <!--role="form" method="POST" enctype="multipart/form-data" action="/hsapi/_internal/create-hydro-program/">-->
+    <!--{% csrf_token %}-->
 
 
-    <section style="width: 100%;height: 200px; margin: auto;padding: 10px;">
-        <div id="drop_zone" style="margin: 1 auto; margin-right: 50px; width:60%;float:left;">
-            <br>
-            Drop files here <br><br><br>
+    <!--<form class="form-horizontal" role="form" method="POST" enctype="multipart/form-data" action="/hsapi/_internal/create-hydro-program/">-->
+    <!--<form id="my-awesome-dropzone" class="dropzone">-->
+    <!--{% csrf_token %}-->
+    <div id="actions" class="row">
 
-            <input type="file" id="fileBrowse" style="display: none;" />
-            <input type="button" class="btn btn-primary btn-lg" value="Browse for Files" onclick="document.getElementById('fileBrowse').click();" />
-        </div>
 
+      <div class="col-lg-7">
+        <!-- The fileinput-button span is used to style the file input field as button -->
+        <span class="btn btn-success fileinput-button dz-clickable">
+            <i class="glyphicon glyphicon-plus"></i>
+            <span>Add files...</span>
+        </span>
+        <!--<button type="submit" class="btn btn-primary start">-->
+            <!--<i class="glyphicon glyphicon-upload"></i>-->
+            <!--<span>Start upload</span>-->
+        <!--</button>-->
+        <!--<button type="reset" class="btn btn-warning cancel">-->
+            <!--<i class="glyphicon glyphicon-ban-circle"></i>-->
+            <!--<span>Cancel upload</span>-->
+        <!--</button>-->
+      </div>
+
+      <div class="col-lg-5">
+        <!-- The global file processing state -->
+        <span class="fileupload-process">
+          <!--<div id="total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">-->
+            <!--<div class="progress-bar progress-bar-success" style="width: 100%;" data-dz-uploadprogress=""></div>-->
+          <!--</div>-->
+        </span>
+      </div>
+
+    </div>
+    <div class="table table-striped" class="files" id="previews">
+      <div id="template" class="file-row">
+        <!-- This is used as the file preview template -->
         <div>
-            <br><br>
-            <ul>
-              <li>All of the files you upload here will be grouped together into a "Resource"</li>
-              <li>File size is limited to 4 GB per file</li>
-              <li>Once you've added all of your files, you can describe your Resource using the form below</li>
-              <li>Files are private, until you choose to share them</li>
-            </ul>
+            <span class="preview"><img data-dz-thumbnail /></span>
         </div>
-    </section>
+        <div>
+            <p class="name" data-dz-name></p>
+            <strong class="error text-danger" data-dz-errormessage></strong>
+        </div>
+        <div>
+            <p class="size" data-dz-size></p>
+            <!--<div id="total-progress" class="progress progress-striped active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">-->
+              <!--<div class="progress-bar progress-bar-success" style="width:0%;" data-dz-uploadprogress></div>-->
+            <!--</div>-->
+        </div>
+        <div>
+          <!--<button class="btn btn-primary start">-->
+              <!--<i class="glyphicon glyphicon-upload"></i>-->
+              <!--<span>Start</span>-->
+          <!--</button>-->
+          <!--<button data-dz-remove class="btn btn-warning cancel">-->
+              <!--<i class="glyphicon glyphicon-ban-circle"></i>-->
+              <!--<span>Cancel</span>-->
+          <!--</button>-->
+          <button data-dz-remove class="btn btn-danger delete">
+            <i class="glyphicon glyphicon-trash"></i>
+            <span>Remove</span>
+          </button>
+        </div>
+        <!--<div class="dropdown">-->
+          <!--<button data-fileDescription = "" class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-expanded="true">-->
+            <!--Select One-->
+            <!--<span class="caret"></span>-->
+          <!--</button>-->
+          <!--<ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1">-->
+            <!--<li><a data-isunique="false" href="#">Option 1</a></li>-->
+            <!--<li><a data-isunique="false" href="#">Option 2</a></li>-->
+            <!--<li><a data-isunique="false" href="#">Option 3</a></li>-->
+            <!--<li><a data-isunique="true" href="#">Option 4</a></li>-->
+          <!--</ul>-->
+        <!--</div>-->
 
-        <br>
-        <br>
 
-    <!--<output id="list">-->
-        <!--<ul id="filelist">-->
+        <div class="dropdown">
 
-        <!--</ul>-->
-    <!--</output>-->
-
-        <div id="uploaded_files">
-
-            <table id="uploaded_files_table">
-
-            </table>
-
+          <select class="btn btn-default dropdown-toggle" onchange="onDropDownClick(event);" id="drop_down_menu">
+            <option data-isunique="true" value="">Select One</option>
+            <option data-isunique="true" value="Option 1">Source Code</option>
+            <option data-isunique="true" value="Option 2">User Manual</option>
+            <option data-isunique="true" value="Option 3">Theoretical Manual</option>
+            <option data-isunique="true" value="Option 4">Release Notes</option>
+            <option data-isunique="true" value="Option 4">Installation Notes</option>
+          </select>
         </div>
 
+
+      </div>
+
+
+    </div>
+
+    <!--<input id="csrf_token" value="{{ csrf_token }}" />-->
+    <input type="file" multiple="multiple" class="dz-hidden-input" id="csrf_token" value="{{ csrf_token }}" style="visibility: hidden; position: absolute; top: 0px; left: 0px; height: 0px; width: 0px;">
+
+
+
+
+
+
+
+
         <br>
         <br>
         <br>
+
+
+
+    <div class="form-horizontal">
+
+
+
 
 <h2>Describe your Resource with metadata:</h2>
 
@@ -87,12 +189,14 @@
 
   <h3> General Metadata: </h3>
 
+
                                     {# DUBLIN CORE METADATA #}
      <!--title-->
   <div class="form-group">
     <label for="" class="col-sm-2 control-label">Title*</label>
     <div class="col-sm-10">
-      <input type="text" class="form-control" name="title" id="title" placeholder="Title">
+        <input type="text" class="form-control upload" name="title" id="" placeholder="Title">
+      <!--<input type="text" class="form-control" name="title" id="title" placeholder="Title">-->
     </div>
   </div>
 
@@ -216,9 +320,30 @@
   </div>
 
 
+
+
+
+    <!--eula-->
+    <div class="form-group">
+    <label for="" class="col-sm-2 control-label">Rights</label>
+    <div class="col-sm-10">
+      <select class="form-control" id="eula_selector" name='eula_selector'>
+          <option value="None">Please choose...</option>
+          <option value="gnugeneralpubliclicense,version3">GNU GENERAL PUBLIC LICENSE, Version 3</option>
+          <option value="gnugeneralpubliclicense,version2">GNU General Public License, Version 2</option>
+          <option value="mitlicense">MIT License (MIT)</option>
+          <option value="mozillapubliclicense2.0">Mozilla Public License 2.0</option>
+      </select>
+       <br>
+      <textarea class="form-control" name="eula" id="eula" cols="30" rows="10" placeholder="Select or create a software license agreement" readonly></textarea>
+    </div>
+        </div>
     <br>
-    <hr/>
+
     <br>
+        <hr/>
+    <br>
+
 
     <h3>  Missing? </h3>
 
@@ -238,39 +363,76 @@
     </div>
 </div>
 
-    <!--eula-->
-    <div class="form-group">
-    <label for="" class="col-sm-2 control-label">Rights</label>
-    <div class="col-sm-10">
-      <select class="form-control" id="eula_selector" name='eula_selector'>
-          <option value="None">Please choose...</option>
-          <option value="gnugeneralpubliclicense,version3">GNU GENERAL PUBLIC LICENSE, Version 3</option>
-          <option value="gnugeneralpubliclicense,version2">GNU General Public License, Version 2</option>
-          <option value="mitlicense">MIT License (MIT)</option>
-          <option value="mozillapubliclicense2.0">Mozilla Public License 2.0</option>
-      </select>
-       <br>
-      <textarea class="form-control" name="eula" id="eula" cols="30" rows="10" placeholder="Select or create a software license agreement" readonly></textarea>
-    </div>
-        </div>
-    <br>
-
-
-
-
-
   <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
-      <button type="submit" class="btn btn-primary btn-lg btn-block">Create Resource</button>
+    <div id="submitContainer" class="col-sm-offset-2 col-sm-10">
+      <button type="submit" id="create_resource_button" class="btn btn-primary btn-lg btn-block start">Create Resource</button>
     </div>
   </div>
+</div>
+
+
+
+
+    <script src="../static/js/init.js"></script>
 
 </form>
 
+
+
 {% endblock %}
 
+
+
 {% block extra_js %}
-    <script type="text/javascript">
+
+    <!--{% if messages %}-->
+        <!--{% for message in messages %}-->
+            <!--alert(message);-->
+        <!--{% endfor %}-->
+    <!--{% endif %}-->
+
+                <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/dropzone.js"></script>
+
+
+   <script type="text/javascript">
+
+       var FileList = new Array();
+
+    function  doBuildResource(){
+
+        // Upload file list
+
+        //fire submit button
+
+        submit_button = document.getElementById('create_resource_button');
+
+
+        //var f = evt.target.files[i];
+        //var r = new FileReader();
+        //r.onload = function(e) {
+        //    var contents = e.target.result;
+
+        // call view to get data
+        $.ajax({
+                type:"POST",
+                url:'/hsapi/_internal/upload-files/',
+                data: {
+                        content: FileList},
+
+                success: function(r) {
+
+                    console.log(r);
+
+                }});
+
+        // wait for file upload
+
+        ///submit_button.click();
+    }
 
 
     function deleteRow(r) {
@@ -285,8 +447,11 @@
         var fileCount = 1;
 
 
-
-
+// Get the template HTML and remove it from the doumenthe template HTML and remove it from the doument
+//    var previewNode = document.querySelector("#template");
+//    previewNode.id = "";
+//    var previewTemplate = previewNode.parentNode.innerHTML;
+//    previewNode.parentNode.removeChild(previewNode);
 
         $("#add-row").click(function() {
             fileCount++;
@@ -342,274 +507,288 @@
         // ---------------------
         // Select Files Function
         //----------------------
-
-
-        $("#fileBrowse").change(function(evt){
-            console.log(evt);
-            console.log(evt.target.files);
-            alert('File Selected');
-
-            // Parse the files
-            files = evt.target.files;
-            for (var i= 0; i<files.length; i++){
-                ParseMetadataFile(files[i]);
-            }
-
-            // Add them to the template
-            handleFileSelect(evt);
-        });
-
-        // Setup the dnd listeners.
-        var dropZone = document.getElementById('drop_zone');
-        dropZone.addEventListener('dragover', handleDragOver, false);
-        dropZone.addEventListener('drop', fileDrop, false);
-
-        var control = document.getElementById('my-files');
-        control.addEventListener("change", function(evt) {
-
-
-
-        // When the control has changed, there are new files
-        var i = 0,
-            files = control.files,
-            len = files.length;
-
-
-        for (; i < len; i++) {
-
-            ext =  files[i].name.split('.').pop();
-            console.log("Filename: " + files[i].name);
-            console.log("Type: " + files[i].type);
-            console.log("Size: " + files[i].size + " bytes");
-            console.log("Extension: " + ext);
-
-            if (ext == 'meta'){
-                console.log('I can parse this file!');
-
-                var f = evt.target.files[i];
-                if (f) {
-                    var r = new FileReader();
-                    r.onload = function(e) {
-	                    var contents = e.target.result;
-{#                        alert( "Got the file.n"#}
-{#                              +"name: " + f.name + "\n"#}
-{#                              +"type: " + f.type + "\n"#}
-{#                              +"size: " + f.size + " bytes \n"#}
-{#                              + contents.substr(1, contents.indexOf("n")));#}
-
-                        // call view to get data
-                        $.ajax({
-                                type:"POST",
-                                url:'/hsapi/_internal/parse-metadata/',
-                                data: { name: f.name,
-                                        size: f.size,
-                                        type: f.type,
-                                        content: contents},
-
-                                success: function(response){
-
-                                    console.log(response);
-
-                                    var data = response['data'];
-
-
-                                    // set field data
-                                    document.getElementById('title').value = data['content']['resource'][0]['title'];
-                                    document.getElementById('abstract').value = data['content']['resource'][0]['abstract'];
-                                    document.getElementById('keywords').value = data['content']['resource'][0]['subject'];
-
-                                    // create breakline object
-                                    var break_line = document.createElement("br");
-
-                                    // add creator fields
-                                    var creators = data['content']['creator'];
-                                    var l = creators.length;
-
-                                    if (l > 0){
-                                        var creator_txt = creators[0]["name"];
-                                        document.getElementById('creators').value = creator_txt;
-                                    }
-                                    for (var i = 1; i < l; i++) {
-{#                                        var creator_txt = creators[i]["name"];#}
-
-                                        {#  Create creator new field         #}
-                                        var f = document.createElement("input");
-                                        f.setAttribute('type',"text");
-                                        f.setAttribute('class',"form-control");
-                                        f.setAttribute('name',"creators");
-                                        f.setAttribute('value',creators[i]["name"]);
-
-
-                                        document.getElementById("creators_group").appendChild(break_line);
-                                        document.getElementById("creators_group").appendChild(f);
-                                        {#  Should this also contain other creator metadata? #}
-                                    }
-
-                                    // add contributor fields
-                                    var contrib = data['content']['contributor'];
-                                    console.log(contrib);
-                                    l = contrib.length;
-                                    console.log(l);
-                                    if (l > 0){
-                                        var contrib_txt = contrib[0]["name"];
-                                        document.getElementById('contributors').value = contrib_txt;
-                                    }
-                                    for (var i = 1; i < l; i++){
-                                        f = document.createElement("input");
-                                        f.setAttribute('type',"text");
-                                        f.setAttribute('class',"form-control");
-                                        f.setAttribute('name',"contributors");
-                                        f.setAttribute('value',contrib[i]["name"]);
-                                        document.getElementById("contributors_group").appendChild(break_line);
-                                        document.getElementById("contributors_group").appendChild(f);
-                                        {#  Should this also contain other creator metadata? #}
-                                    }
-
-
-
-                                    document.getElementById('software_version').value = data['content']['software'][0]['version'];
-                                    document.getElementById('software_url').value = data['content']['software'][0]['url'];
-                                    document.getElementById('date_released').value = data['content']['software'][0]['date_released'];
-                                    document.getElementById('software_version').value = data['content']['software'][0]['version'];
-
-                                },
-                                error: function(response){
-                                    console.log('POST Error');
-                                    console.log(response);
-                                }
-                        });
-                    }
-                    r.readAsText(f);
-
-                } else {
-                    alert("Failed to load file");
-                }
-
-
-            }
-        }
-    }, false);
-
-        function fileDrop(evt){
-
-            // get the files that were dropped
-            evt.stopPropagation();
-            evt.preventDefault();
-
-            var files = evt.dataTransfer.files; // FileList object.
-
-            // Parse the files
-{#            files = evt.target.files;#}
-            console.log(files[i]);
-            for (var i= 0; i<files.length; i++){
-
-                ParseMetadataFile(files[i]);
-            }
-
-            // Add them to the template
-{#            handleFileSelect(evt);#}
-            createFileElement(files[0]);
-        }
-
-
-        function createFileElement(f){
-
-            // save this file
-            myfiles[f.name] = f;
-
-            // create a select list
-            var selections = ['source code','executable','user manual','theoretical manual','other'];
-            var select_list = document.createElement('select');
-            select_list.id = 'mySelect';
-            for (var i =0; i < selections.length; i++){
-                var option = document.createElement('option');
-                option.value = selections[i];
-                option.text = selections[i];
-                select_list.appendChild(option);
-            }
-
-            // add new fields for each file
-//            var filelist = document.getElementById('filelist');
 //
-//            var li = document.createElement("li");
-//            var value = [];
-//            value.push('<strong>', f.name, '</strong> (', f.type || 'n/a', ') - ',
-//                            f.size, ' bytes, last modified: ',
+//
+//        $("#fileBrowse").change(function(evt){
+//            console.log(evt);
+//            console.log(evt.target.files);
+//            alert('File Selected');
+//
+//            // Parse the files
+//            files = evt.target.files;
+//            for (var i= 0; i<files.length; i++){
+//                ParseMetadataFile(files[i]);
+//            }
+//
+//            // Add them to the template
+//            handleFileSelect(evt);
+//        });
+//
+//        // Setup the dnd listeners.
+//        var dropZone = document.getElementById('drop_zone');
+//        dropZone.addEventListener('dragover', handleDragOver, false);
+//        dropZone.addEventListener('drop', fileDrop, false);
+//
+//        var control = document.getElementById('my-files');
+//        control.addEventListener("change", function(evt) {
+//
+//
+//
+//        // When the control has changed, there are new files
+//        var i = 0,
+//            files = control.files,
+//            len = files.length;
+//
+//
+//        for (; i < len; i++) {
+//
+//            ext =  files[i].name.split('.').pop();
+//            console.log("Filename: " + files[i].name);
+//            console.log("Type: " + files[i].type);
+//            console.log("Size: " + files[i].size + " bytes");
+//            console.log("Extension: " + ext);
+//
+//            if (ext == 'meta'){
+//                console.log('I can parse this file!');
+//
+//                var f = evt.target.files[i];
+//                if (f) {
+//                    var r = new FileReader();
+//                    r.onload = function(e) {
+//	                    var contents = e.target.result;
+////{#                        alert( "Got the file.n"#}
+////{#                              +"name: " + f.name + "\n"#}
+////{#                              +"type: " + f.type + "\n"#}
+////{#                              +"size: " + f.size + " bytes \n"#}
+////{#                              + contents.substr(1, contents.indexOf("n")));#}
+//
+//                        // call view to get data
+//                        $.ajax({
+//                                type:"POST",
+//                                url:'/hsapi/_internal/parse-metadata/',
+//                                data: { name: f.name,
+//                                        size: f.size,
+//                                        type: f.type,
+//                                        content: contents},
+//
+//                                success: function(response){
+//
+//                                    console.log(response);
+//
+//                                    var data = response['data'];
+//
+//
+//                                    // set field data
+//                                    document.getElementById('title').value = data['content']['resource'][0]['title'];
+//                                    document.getElementById('abstract').value = data['content']['resource'][0]['abstract'];
+//                                    document.getElementById('keywords').value = data['content']['resource'][0]['subject'];
+//
+//                                    // create breakline object
+//                                    var break_line = document.createElement("br");
+//
+//                                    // add creator fields
+//                                    var creators = data['content']['creator'];
+//                                    var l = creators.length;
+//
+//                                    if (l > 0){
+//                                        var creator_txt = creators[0]["name"];
+//                                        document.getElementById('creators').value = creator_txt;
+//                                    }
+//                                    for (var i = 1; i < l; i++) {
+//{#                                        var creator_txt = creators[i]["name"];#}
+//
+//                                        {#  Create creator new field         #}
+//                                        var f = document.createElement("input");
+//                                        f.setAttribute('type',"text");
+//                                        f.setAttribute('class',"form-control");
+//                                        f.setAttribute('name',"creators");
+//                                        f.setAttribute('value',creators[i]["name"]);
+//
+//
+//                                        document.getElementById("creators_group").appendChild(break_line);
+//                                        document.getElementById("creators_group").appendChild(f);
+//                                        {#  Should this also contain other creator metadata? #}
+//                                    }
+//
+//                                    // add contributor fields
+//                                    var contrib = data['content']['contributor'];
+//                                    console.log(contrib);
+//                                    l = contrib.length;
+//                                    console.log(l);
+//                                    if (l > 0){
+//                                        var contrib_txt = contrib[0]["name"];
+//                                        document.getElementById('contributors').value = contrib_txt;
+//                                    }
+//                                    for (var i = 1; i < l; i++){
+//                                        f = document.createElement("input");
+//                                        f.setAttribute('type',"text");
+//                                        f.setAttribute('class',"form-control");
+//                                        f.setAttribute('name',"contributors");
+//                                        f.setAttribute('value',contrib[i]["name"]);
+//                                        document.getElementById("contributors_group").appendChild(break_line);
+//                                        document.getElementById("contributors_group").appendChild(f);
+//                                        {#  Should this also contain other creator metadata? #}
+//                                    }
+//
+//
+//
+//                                    document.getElementById('software_version').value = data['content']['software'][0]['version'];
+//                                    document.getElementById('software_url').value = data['content']['software'][0]['url'];
+//                                    document.getElementById('date_released').value = data['content']['software'][0]['date_released'];
+//                                    document.getElementById('software_version').value = data['content']['software'][0]['version'];
+//
+//                                },
+//                                error: function(response){
+//                                    console.log('POST Error');
+//                                    console.log(response);
+//                                }
+//                        });
+//                    }
+//                    r.readAsText(f);
+//
+//                } else {
+//                    alert("Failed to load file");
+//                }
+//
+//
+//            }
+//        }
+//    }, false);
+
+//        function fileDrop(evt){
+//
+//            // get the files that were dropped
+//            evt.stopPropagation();
+//            evt.preventDefault();
+//
+//            var files = evt.dataTransfer.files; // FileList object.
+//
+//            var inp = document.getElementById('fileBrowse').files[0];
+//
+//           // save this file in the FileList
+//            FileList.push(files[0]);
+//
+//            evt.preventDefault();
+//            //var files = evt.dataTransfer.files;
+//
+//            reader = new FileReader();
+//            reader.onload = function(event) {
+//                document.getElementById('fileBrowse').value = evt.target.result;
+//            }
+//            reader.readAsDataURL(files[0]);
+//
+//            // Parse the files
+//{#            files = evt.target.files;#}
+//            console.log(files[i]);
+//            for (var i= 0; i<files.length; i++){
+//
+//                ParseMetadataFile(files[i]);
+//            }
+//
+//            // Add them to the template
+//{#            handleFileSelect(evt);#}
+//            createFileElement(files[0]);
+//        }
+
+
+//        function createFileElement(f){
+//
+//            // save this file
+//            myfiles[f.name] = f;
+//
+//            // create a select list
+//            var selections = ['source code','executable','user manual','theoretical manual','other'];
+//            var select_list = document.createElement('select');
+//            select_list.id = 'mySelect';
+//            for (var i =0; i < selections.length; i++){
+//                var option = document.createElement('option');
+//                option.value = selections[i];
+//                option.text = selections[i];
+//                select_list.appendChild(option);
+//            }
+//
+//            // add new fields for each file
+////            var filelist = document.getElementById('filelist');
+////
+////            var li = document.createElement("li");
+////            var value = [];
+////            value.push('<strong>', f.name, '</strong> (', f.type || 'n/a', ') - ',
+////                            f.size, ' bytes, last modified: ',
+////                          f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
+////                          '</li>');
+////            li.innerHTML = value.join('');
+////            console.log(li);
+////
+////            // create breakline object
+////            var break_line = document.createElement("br");
+////
+////            filelist.appendChild(break_line);
+////            filelist.appendChild(li);
+//
+//            var table = document.getElementById('uploaded_files_table');
+//            var row = table.insertRow(table.rows.length);
+//
+//
+//            var text = document.createTextNode(f.name);
+//            //var element.appendChild(select_list);
+//
+//            var cell_filename = row.insertCell(0);
+//            cell_filename.style.paddingLeft = '10px';
+//            cell_filename.style.paddingRight = '10px';
+//            cell_filename.style.fontWeight = 'bold';
+//            cell_filename.appendChild(text);
+//
+//            var cell_type = row.insertCell(1);
+//            cell_type.style.paddingLeft = '10px';
+//            cell_type.style.paddingRight = '10px';
+//            var type = f.type || 'n/a';
+//            cell_type.appendChild(document.createTextNode( 'type: ' + type));
+//
+//            var cell_size = row.insertCell(2);
+//            cell_size.style.paddingLeft = '10px';
+//            cell_size.style.paddingRight = '10px';
+//            cell_size.appendChild(document.createTextNode( 'size: ' + f.size + ' bytes'));
+//
+//            var cell_date = row.insertCell(3);
+//            cell_date.style.paddingLeft = '10px';
+//            cell_date.style.paddingRight = '10px';
+//            var date = f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a';
+//            cell_date.appendChild(document.createTextNode( 'last modified: ' +date));
+//
+//            var cell_list = row.insertCell(4);
+//            cell_list.appendChild(select_list);
+//
+//
+//        }
+
+//        function handleFileSelect(evt) {
+//
+//
+//            evt.stopPropagation();
+//            evt.preventDefault();
+//
+//            var files = evt.dataTransfer.files; // FileList object.
+//
+//            // files is a FileList of File objects. List some properties.
+//            var output = [];
+//            for (var i = 0, f; f = files[i]; i++) {
+//              output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
+//                          f.size, ' bytes, last modified: ',
 //                          f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
 //                          '</li>');
-//            li.innerHTML = value.join('');
-//            console.log(li);
+//            }
+//            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
+//          }
 //
-//            // create breakline object
-//            var break_line = document.createElement("br");
-//
-//            filelist.appendChild(break_line);
-//            filelist.appendChild(li);
-
-            var table = document.getElementById('uploaded_files_table');
-            var row = table.insertRow(table.rows.length);
-
-
-            var text = document.createTextNode(f.name);
-            //var element.appendChild(select_list);
-
-            var cell_filename = row.insertCell(0);
-            cell_filename.style.paddingLeft = '10px';
-            cell_filename.style.paddingRight = '10px';
-            cell_filename.style.fontWeight = 'bold';
-            cell_filename.appendChild(text);
-
-            var cell_type = row.insertCell(1);
-            cell_type.style.paddingLeft = '10px';
-            cell_type.style.paddingRight = '10px';
-            var type = f.type || 'n/a';
-            cell_type.appendChild(document.createTextNode( 'type: ' + type));
-
-            var cell_size = row.insertCell(2);
-            cell_size.style.paddingLeft = '10px';
-            cell_size.style.paddingRight = '10px';
-            cell_size.appendChild(document.createTextNode( 'size: ' + f.size + ' bytes'));
-
-            var cell_date = row.insertCell(3);
-            cell_date.style.paddingLeft = '10px';
-            cell_date.style.paddingRight = '10px';
-            var date = f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a';
-            cell_date.appendChild(document.createTextNode( 'last modified: ' +date));
-
-            var cell_list = row.insertCell(4);
-            cell_list.appendChild(select_list);
-
-
-        }
-
-        function handleFileSelect(evt) {
-
-
-            evt.stopPropagation();
-            evt.preventDefault();
-
-            var files = evt.dataTransfer.files; // FileList object.
-
-            // files is a FileList of File objects. List some properties.
-            var output = [];
-            for (var i = 0, f; f = files[i]; i++) {
-              output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                          f.size, ' bytes, last modified: ',
-                          f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                          '</li>');
-            }
-            document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
-          }
-
-          function handleDragOver(evt) {
-            evt.stopPropagation();
-            evt.preventDefault();
-            evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-        }
+//          function handleDragOver(evt) {
+//            evt.stopPropagation();
+//            evt.preventDefault();
+//            evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+//        }
 
 
         $("eula_selector").change(function(){
-{#        eula_selector.addEventListener("change", function(evt) {#}
+//{#        eula_selector.addEventListener("change", function(evt) {#}
 
 
             // get selected value
@@ -619,11 +798,8 @@
 
             eula.value = selected_name;
 
-
-
-
-}, false);
-    });
+            }, false);
+//    });
 
 
         function ParseMetadataFile(f) {
@@ -735,7 +911,11 @@
             }
         }
 
+    });
+
+
 
 
     </script>
+
 {% endblock %}

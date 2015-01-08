@@ -16,6 +16,10 @@ import os
 from django.conf import settings
 from .metadata import parser
 import mmap
+from mezzanine.pages.page_processors import processor_for
+from django.template import RequestContext
+# from django.contrib import messages
+from crispy_forms.helper import FormHelper
 
 
 class DetailView(generic.DetailView):
@@ -24,21 +28,57 @@ class DetailView(generic.DetailView):
     template_name = 'hs_hydroprogram/detail.html'
 
 
-
-
-
 class CreateHydroProgramForm(forms.Form):
+    #
+    # def __init__(self, *args, **kwargs):
+    #     super(CreateHydroProgramForm,self).__init(*args, **kwargs)
+    #     self.helper= FormHelper()
+    #     self.helper.html5_required = True
+
     title = forms.CharField(required=True)
     creators = forms.CharField(required=False, min_length=0)
     contributors = forms.CharField(required=False, min_length=0)
     abstract = forms.CharField(required=False, min_length=0)
     keywords = forms.CharField(required=False, min_length=0)
-    # rest_url = forms.URLField(required=False)
-    # wsdl_url = forms.URLField(required=False)
-    reference_type = forms.CharField(required=False, min_length=0)
-    # site = forms.CharField(required=False, min_length=0)
-    # variable = forms.CharField(required=False, min_length=0)
-    software_url = forms.CharField(required=False, min_length=0)
+    # # rest_url = forms.URLField(required=False)
+    # # wsdl_url = forms.URLField(required=False)
+    # reference_type = forms.CharField(required=False, min_length=0)
+    # # site = forms.CharField(required=False, min_length=0)
+    # # variable = forms.CharField(required=False, min_length=0)
+    # software_url = forms.CharField(required=False, min_length=0)
+
+    software_version = forms.CharField(required=False,max_length=255)
+    software_language = forms.CharField(required=False,max_length=100)
+    operating_sys = forms.CharField(required=False,max_length=255)
+    date_released = forms.DateTimeField(required=True)
+    release_notes = forms.CharField(required=False)
+    program_website = forms.CharField(required=True, max_length=255)
+    software_repo = forms.CharField(required=True, max_length=255)
+    user_manual = forms.FileField(required=False)
+    theoretical_manual = forms.FileField(required=False)
+    source_code = forms.FileField(required=False)
+    exec_code = forms.FileField(required=False)
+    build_notes = forms.CharField(required=False)
+
+
+
+
+def file_upload(request):
+
+    print 'Upload function'
+
+    form_data = {'title':'My Title'}
+
+    # return back some info
+    #return render(request,'pages/create-hydro-program.html',form_data)
+    return render_to_response('pages/create-hydro-program.html',form_data, context_instance=RequestContext(request))
+    #return render_to_response('create-resource.html',{'form':form})
+ #   return HttpResponse()
+
+
+def mytest(request, *args, **kwargs):
+
+    print 'TEST'
 
 
 @login_required
@@ -46,54 +86,115 @@ def create_hydro_program(request, *args, **kwargs):
 
     print 'CREATE RESOURCE'
 
-    #eula = json.loads('../static/resources/eula.json')
-    #print eula
-
-#    return render(request, 'template.html', {"mydata": mydata},
-#        content_type="application/xhtml+xml")
-
-    frm = CreateHydroProgramForm(request.POST)
-
-    if frm.is_valid():
+    form = CreateHydroProgramForm(request.POST)
+    print request.POST['creators']
+    #print frm
+    #print request.FILES.getlist('files'),
+    if form.is_valid():
         dcterms = [
-            { 'term': 'T', 'content': frm.cleaned_data['title']},
-            { 'term': 'AB', 'content': frm.cleaned_data['abstract'] or frm.cleaned_data['title']},
+            { 'term': 'T', 'content': form.cleaned_data['title']},
+            { 'term': 'AB', 'content': form.cleaned_data['abstract'] or form.cleaned_data['title']},
             { 'term': 'DTS', 'content': now().isoformat()}
         ]
 
-        # for cn in frm.cleaned_data['contributors'].split(','):
-        #     cn = cn.strip()
-        #     dcterms.append({'term' : 'CN', 'content' : cn})
-        # for cr in frm.cleaned_data['creators'].split(','):
-        #     cr = cr.strip()
-        #     dcterms.append({'term' : 'CR', 'content' : cr})
-
-        # if frm.cleaned_data['wsdl_url']:
-        #     url = frm.cleaned_data['wsdl_url']
-        # elif frm.cleaned_data['rest_url']:
-        #     url = frm.cleaned_data['rest_url']
-        # else:
-        #     url = ''
+        for cn in form.cleaned_data['contributors'].split(','):
+            cn = cn.strip()
+            dcterms.append({'term' : 'CN', 'content' : cn})
+        for cr in form.cleaned_data['creators'].split(','):
+            cr = cr.strip()
+            dcterms.append({'term' : 'CR', 'content' : cr})
 
 
-        print 'HERE'
-
+        # get files
+        file_map = form.cleaned_data['file_map']
+        uploaded_files = {}
+        for f in request.files:
+            tag = file_map[f.name]
+            upload_files[tag] = f
 
         res = hydroshare.create_resource(
             resource_type='HydroProgramResource',
             owner=request.user,
-            title=frm.cleaned_data['title'],
-            keywords=[k.strip() for k in frm.cleaned_data['keywords'].split(',')] if frm.cleaned_data['keywords'] else None,
+            title=form.cleaned_data['title'],
+            keywords=[k.strip() for k in form.cleaned_data['keywords'].split(',')] if form.cleaned_data['keywords'] else None,
             dublin_metadata=dcterms,
-            content=frm.cleaned_data['abstract'] or frm.cleaned_data['title'],
-            # reference_type=frm.cleaned_data['reference_type'],
-            software_url=frm.cleaned_data['software_url'],
-            # data_site=frm.cleaned_data.get('site', ''),
-            # variable=frm.cleaned_data.get('variable', ''),
-            #software_rights = frm.cleaned_data['eula'],
+            content=form.cleaned_data['abstract'] or form.cleaned_data['title'],
+            ###########
+            software_version = form.cleaned_data['sofware_version'],
+            software_language = form.cleaned_data['software_language'],
+            operating_sys = form.cleaned_data['operating_sys'],
+            date_released = form.cleaned_data['date_released'],
+            release_notes = form.cleaned_data['release_notes'],
+            program_website =form.cleaned_data['program_website'],
+            software_repo =form.cleaned_data['software_repo'],
+            user_manual =form.cleaned_data[''],
+            theoretical_manual =form.cleaned_data[''],
+            source_code =form.cleaned_data[''],
+            exec_code =form.cleaned_data[''],
+            build_notes =form.cleaned_data[''],
         )
         return HttpResponseRedirect(res.get_absolute_url())
+    else:
+        # messages.error(request, "Error")
+        #return render_to_response('pages/create-hydro-program.html',frm, context_instance=RequestContext(request))
+        context = {'form': form,'test':'somevalue'}
+        return render_to_response('pages/create-hydro-program.html', context ,context_instance=RequestContext(request))
+        #return render(request, 'pages/create-hydro-program.html', {'form':frm})
 
+# #todo:  Copied from Ref Time Series.  Do I need this?
+# @processor_for(HydroProgramResource)
+# def add_dublin_core(request, page):
+#     from dublincore import models as dc
+#
+#     class DCTerm(forms.ModelForm):
+#         class Meta:
+#             model = dc.QualifiedDublinCoreElement
+#             fields = ['term', 'content']
+#
+#     cm = page.get_content_model()
+#     try:
+#         abstract = cm.dublin_metadata.filter(term='AB').first().content
+#     except:
+#         abstract = None
+#
+#     return {
+#         'dublin_core': [t for t in cm.dublin_metadata.all().exclude(term='AB').exclude(term='DM').exclude(term='DC').exclude(term='DTS').exclude(term='T')],
+#         'abstract' : abstract,
+#         'short_id' : cm.short_id,
+#         'resource_type': cm._meta.verbose_name,
+#         'reference_type': cm.reference_type,
+#         'url': cm.url,
+#         'site_name': cm.data_site_name if cm.data_site_name else '',
+#         'site_code' : cm.data_site_code if cm.data_site_code else '',
+#         'variable_name': cm.variable_name if cm.variable_name else '',
+#         'variable_code': cm.variable_code if cm.variable_code else '',
+#         'files': cm.files.all(),
+#         'dcterm_frm': DCTerm(),
+#         'bag': cm.bags.first(),
+#         'users': User.objects.all(),
+#         'groups': Group.objects.all(),
+#         'owners': set(cm.owners.all()),
+#         'view_users': set(cm.view_users.all()),
+#         'view_groups': set(cm.view_groups.all()),
+#         'edit_users': set(cm.edit_users.all()),
+#         'edit_groups': set(cm.edit_groups.all()),
+#     }
+
+
+
+def upload_files(request):
+
+
+    print 'here!'
+
+    files = request.POST.get('content', 'NONE')
+
+    data = {'response': 'I received the file list on the server!'}
+
+
+    #render_to_response('create_hydro_program.html', {'h': 'test'})
+
+    return json_response(True,data)
 
 def parse_metadata(request):
 
@@ -165,6 +266,3 @@ def get_eula(request):
 def json_response(result, data):
     response = json.dumps({"result" : result, "data" : data })
     return HttpResponse(response, mimetype="application/json")
-
-def my_view(request):
-    json_response(True, 'Right away Michael')

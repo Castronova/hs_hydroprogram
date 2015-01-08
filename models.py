@@ -3,9 +3,9 @@ from django.contrib.auth.models import User, Group
 from django.db import models
 from mezzanine.pages.models import Page, RichText
 from mezzanine.core.models import Ownable
-from hs_core.models import AbstractResource
+from hs_core.models import AbstractResource, resource_processor
 import datetime as dt
-
+from mezzanine.pages.page_processors import processor_for
 
 #
 # To create a new resource, use these three super-classes. 
@@ -213,4 +213,4 @@ class HydroProgramResource(Page, RichText, AbstractResource):
     class Meta:
         verbose_name = 'HydroProgram'
 
-
+processor_for(HydroProgramResource)(resource_processor)
